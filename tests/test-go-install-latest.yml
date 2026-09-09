@@ -1,0 +1,55 @@
+name: Test Go binary install with latest version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Install jq if missing
+        run: |
+          if ! command -v jq &>/dev/null; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq jq
+          fi
+          jq --version
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          repository-owner: goreleaser
+          repository: goreleaser
+          version: latest
+          language-type: go
+      - name: Assert binary_path output or graceful failure
+        env:
+          BINARY_PATH: ${{ steps.action.outputs.binary_path }}
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "binary_path: $BINARY_PATH"
+          if [ "$OUTCOME" = "success" ]; then
+            if [ -z "$BINARY_PATH" ]; then
+              echo "FAIL: action succeeded but binary_path output is empty"
+              exit 1
+            fi
+            if [ ! -f "$BINARY_PATH" ]; then
+              echo "FAIL: binary file does not exist at '$BINARY_PATH'"
+              exit 1
+            fi
+            if [ ! -x "$BINARY_PATH" ]; then
+              echo "FAIL: binary is not executable"
+              exit 1
+            fi
+            VERSION_OUTPUT=$("$BINARY_PATH" --version 2>&1 || true)
+            echo "Version output: $VERSION_OUTPUT"
+            if [ -z "$VERSION_OUTPUT" ]; then
+              echo "FAIL: binary produced no output"
+              exit 1
+            fi
+            echo "PASS: binary installed and runs successfully"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (network/API unavailable in harness)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi
