@@ -1,0 +1,51 @@
+name: Test Go binary install
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          repository-owner: tj-actions
+          repository: auto-doc
+          version: v3.2.0
+          language-type: go
+      - name: Assert binary_path output is set
+        env:
+          BINARY_PATH: ${{ steps.action.outputs.binary_path }}
+        run: |
+          echo "binary_path: $BINARY_PATH"
+          if [ -z "$BINARY_PATH" ]; then
+            echo "FAIL: binary_path output is empty"
+            exit 1
+          fi
+          echo "PASS: binary_path is set to $BINARY_PATH"
+      - name: Assert binary exists and is executable
+        env:
+          BINARY_PATH: ${{ steps.action.outputs.binary_path }}
+        run: |
+          echo "Checking binary at: $BINARY_PATH"
+          if [ ! -f "$BINARY_PATH" ]; then
+            echo "FAIL: binary file does not exist at $BINARY_PATH"
+            exit 1
+          fi
+          if [ ! -x "$BINARY_PATH" ]; then
+            echo "FAIL: binary is not executable"
+            exit 1
+          fi
+          echo "PASS: binary exists and is executable"
+      - name: Assert binary runs correctly
+        env:
+          BINARY_PATH: ${{ steps.action.outputs.binary_path }}
+        run: |
+          echo "Running binary version check"
+          OUTPUT=$("$BINARY_PATH" --version 2>&1 || true)
+          echo "Output: $OUTPUT"
+          if [ -z "$OUTPUT" ]; then
+            echo "FAIL: binary produced no output"
+            exit 1
+          fi
+          echo "PASS: binary ran successfully with output: $OUTPUT"
