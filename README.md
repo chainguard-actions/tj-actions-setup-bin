@@ -11,6 +11,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | v1 | [`v1`](https://github.com/chainguard-actions/tj-actions-setup-bin/tree/v1) | [`cc810cd`](https://github.com/tj-actions/setup-bin/commit/cc810cdd7ca2809436d6cd0c03614b049e787071) |
 | v1.2.1 | [`v1.2.1`](https://github.com/chainguard-actions/tj-actions-setup-bin/tree/v1.2.1) | [`cc2f416`](https://github.com/tj-actions/setup-bin/commit/cc2f416f28163075dc4d67e8b298dcbe2ecf4d5a) |
 | v1.2.3 | [`v1.2.3`](https://github.com/chainguard-actions/tj-actions-setup-bin/tree/v1.2.3) | [`99513d7`](https://github.com/tj-actions/setup-bin/commit/99513d7b4f4e970d0c33c83c5a6d45a59e86f468) |
+| v1.2.4 | [`v1.2.4`](https://github.com/chainguard-actions/tj-actions-setup-bin/tree/v1.2.4) | [`cc810cd`](https://github.com/tj-actions/setup-bin/commit/cc810cdd7ca2809436d6cd0c03614b049e787071) |
 
 ## Privacy
 
