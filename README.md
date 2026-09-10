@@ -1,15 +1,76 @@
-# tj-actions/setup-bin
+[![CI](https://github.com/tj-actions/setup-bin/workflows/CI/badge.svg)](https://github.com/tj-actions/setup-bin/actions?query=workflow%3ACI)
+[![Update release version.](https://github.com/tj-actions/setup-bin/workflows/Update%20release%20version./badge.svg)](https://github.com/tj-actions/setup-bin/actions?query=workflow%3A%22Update+release+version.%22)
+[![Public workflows that use this action.](https://img.shields.io/endpoint?url=https%3A%2F%2Fused-by.vercel.app%2Fapi%2Fgithub-actions%2Fused-by%3Faction%3Dtj-actions%2Fsetup-bin%26badge%3Dtrue)](https://github.com/search?o=desc\&q=tj-actions+setup-bin+language%3AYAML\&s=\&type=Code)
 
-GitHub Action to install Go/Rust binaries
+## setup-bin
 
-Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/tj-actions/setup-bin](https://github.com/tj-actions/setup-bin).
+GitHub action to download and install go and rust binaries from github release artifacts created by [goreleaser-action](https://github.com/goreleaser/goreleaser-action) or [rust-build.action](https://github.com/rust-build/rust-build.action).
 
-## Versions
+```yaml
+...
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup bin
+        id: serup-bin-go
+        uses: tj-actions/setup-bin@cc2f416f28163075dc4d67e8b298dcbe2ecf4d5a # v1
+        with:
+          language-type: 'go'
+          repository-owner: [REPOSITORY_OWNER]
+          repository: [REPOSITORY]
+          
+      - name: Show output
+        run: |
+          echo "setup-bin-go: ${{ steps.setup-bin-go.outputs.binary_path }}"
+```
 
-| Version | Tag | Upstream commit |
-|---------|-----|-----------------|
-| v1.2.1 | [`v1.2.1`](https://github.com/chainguard-actions/tj-actions-setup-bin/tree/v1.2.1) | [`cc2f416`](https://github.com/tj-actions/setup-bin/commit/cc2f416f28163075dc4d67e8b298dcbe2ecf4d5a) |
-| v1.2.3 | [`v1.2.3`](https://github.com/chainguard-actions/tj-actions-setup-bin/tree/v1.2.3) | [`99513d7`](https://github.com/tj-actions/setup-bin/commit/99513d7b4f4e970d0c33c83c5a6d45a59e86f468) |
+## Inputs
+
+<!-- AUTO-DOC-INPUT:START - Do not remove or modify this section -->
+
+|                                              INPUT                                              |  TYPE  | REQUIRED |         DEFAULT         |                       DESCRIPTION                        |
+|-------------------------------------------------------------------------------------------------|--------|----------|-------------------------|----------------------------------------------------------|
+| <a name="input_add-prefix-to-version"></a>[add-prefix-to-version](#input_add-prefix-to-version) | string |  false   |        `"true"`         |     Add v to the version <br>if it doesn't have it       |
+|             <a name="input_language-type"></a>[language-type](#input_language-type)             | string |   true   |                         | Language type of package to <br>install: `rust` or `go`  |
+|                 <a name="input_repository"></a>[repository](#input_repository)                  | string |   true   |                         |       Repository where the binary is <br>located         |
+|        <a name="input_repository-owner"></a>[repository-owner](#input_repository-owner)         | string |   true   |                         |    Repository owner where the binary <br>is located      |
+|                         <a name="input_token"></a>[token](#input_token)                         | string |  false   | `"${{ github.token }}"` |          GITHUB\_TOKEN or a Repo scoped <br>PAT           |
+|                      <a name="input_version"></a>[version](#input_version)                      | string |  false   |       `"latest"`        |          Version of the binary to <br>install            |
+
+<!-- AUTO-DOC-INPUT:END -->
+
+## Outputs
+
+<!-- AUTO-DOC-OUTPUT:START - Do not remove or modify this section -->
+
+|                               OUTPUT                                |  TYPE  |         DESCRIPTION          |
+|---------------------------------------------------------------------|--------|------------------------------|
+| <a name="output_binary_path"></a>[binary\_path](#output_binary_path) | string | Path to the installed binary |
+
+<!-- AUTO-DOC-OUTPUT:END -->
+
+*   Free software: [MIT license](LICENSE)
+
+If you feel generous and want to show some extra appreciation:
+
+[![Buy me a coffee][buymeacoffee-shield]][buymeacoffee]
+
+[buymeacoffee]: https://www.buymeacoffee.com/jackton1
+
+[buymeacoffee-shield]: https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png
+
+## Credits
+
+This package was created with [Cookiecutter](https://github.com/cookiecutter/cookiecutter) using [cookiecutter-action](https://github.com/tj-actions/cookiecutter-action)
+
+## Report Bugs
+
+Report bugs at https://github.com/tj-actions/setup-bin/issues.
+
+If you are reporting a bug, please include:
+
+*   Your operating system name and version.
+*   Any details about your workflow that might be helpful in troubleshooting.
+*   Detailed steps to reproduce the bug.
 
 ## Privacy
 
