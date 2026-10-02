@@ -110,5 +110,5 @@ fi
 chmod +x "$TMPDIR"/"$INPUT_REPOSITORY"
 
 # Return the binary path
-safe_repo=$(printf '%s' "$INPUT_REPOSITORY" | tr -d '\n\r')
-echo "binary_path=$TMPDIR/$safe_repo" >> "$GITHUB_OUTPUT"
+safe_repository=$(printf '%s' "$INPUT_REPOSITORY" | tr -d '\n\r')
+echo "binary_path=$TMPDIR/$safe_repository" >> "$GITHUB_OUTPUT"
