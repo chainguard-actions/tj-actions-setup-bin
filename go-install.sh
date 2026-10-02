@@ -109,6 +109,6 @@ fi
 # Make the binary executable
 chmod +x "$TMPDIR"/"$INPUT_REPOSITORY"
 
-# Return the binary path
-safe_binary_path=$(printf '%s' "$TMPDIR/$INPUT_REPOSITORY" | tr -d '\n\r')
-echo "binary_path=$safe_binary_path" >> "$GITHUB_OUTPUT"
+# Return the binary path (sanitize INPUT_REPOSITORY to prevent newline injection)
+safe_repository=$(printf '%s' "$INPUT_REPOSITORY" | tr -d '\n\r')
+echo "binary_path=$TMPDIR/$safe_repository" >> "$GITHUB_OUTPUT"

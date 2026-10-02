@@ -10,25 +10,18 @@
 
 **Harden Agent Version:** `2`
 
-Action **tj-actions--setup-bin/v1.2.3** was hardened automatically. 2 finding(s) were identified and resolved across 1 iteration(s).
+Action **tj-actions--setup-bin/v1.2.3** was hardened automatically. 1 finding(s) were identified and resolved across 1 iteration(s).
 
 ## Findings Fixed
 
 ### github-env-injection (severity: high)
 
-In go-install.sh, the value `$INPUT_REPOSITORY` — which is set by the calling workflow from `${{ inputs.repository }}` (an untrusted, workflow-controlled input) — is written directly to `$GITHUB_OUTPUT` without the required sanitization step (`printf '%s' ... | tr -d '\n\r'`). A malicious repository name containing newlines could inject arbitrary key=value pairs into the output environment. The offending line is: `echo "binary_path=$TMPDIR/$INPUT_REPOSITORY" >> "$GITHUB_OUTPUT"`
+Both go-install.sh and rust-install.sh write values derived from the untrusted input $INPUT_REPOSITORY (set from inputs.repository via the env: block in action.yml) to $GITHUB_OUTPUT without the required newline-stripping sanitization (printf '%s' "$VAR" | tr -d '\n\r'). In go-install.sh the write is: echo "binary_path=$TMPDIR/$INPUT_REPOSITORY" >> "$GITHUB_OUTPUT". In rust-install.sh the write is: echo "binary_path=$BINARY_PATH" >> "$GITHUB_OUTPUT" where $BINARY_PATH is derived from $INPUT_REPOSITORY. While basename is applied to $INPUT_REPOSITORY at the top of each script, basename only strips path separators — it does NOT strip newline characters. A caller-controlled repository name containing a newline (e.g. "repo\nmalicious_key=injected_value") would inject additional key=value pairs into GITHUB_OUTPUT, potentially overwriting outputs consumed by downstream steps. The fix is to apply safe=$(printf '%s' "$INPUT_REPOSITORY" | tr -d '\n\r') before constructing the path written to $GITHUB_OUTPUT.
 
 Locations:
 
-- `go-install.sh:97`
-
-### github-env-injection (severity: high)
-
-In rust-install.sh, the value `$BINARY_PATH` — which is derived from `$INPUT_REPOSITORY` (set by the calling workflow from `${{ inputs.repository }}`, an untrusted input) and `$TMPDIR` — is written directly to `$GITHUB_OUTPUT` without the required sanitization step (`printf '%s' ... | tr -d '\n\r'`). A malicious repository name containing newlines could inject arbitrary key=value pairs into the output environment. The offending line is: `echo "binary_path=$BINARY_PATH" >> "$GITHUB_OUTPUT"`
-
-Locations:
-
-- `rust-install.sh:298`
+- `go-install.sh:113`
+- `rust-install.sh:338`
 
 ## Iteration Notes
 
@@ -38,7 +31,5 @@ Locations:
 
 **Notes:**
 
-Fixed two github-env-injection findings:
-1. go-install.sh (line 97): Replaced `echo "binary_path=$TMPDIR/$INPUT_REPOSITORY" >> "$GITHUB_OUTPUT"` with a two-step sanitization: `safe_binary_path=$(printf '%s' "$TMPDIR/$INPUT_REPOSITORY" | tr -d '\n\r')` followed by `echo "binary_path=$safe_binary_path" >> "$GITHUB_OUTPUT"`. This prevents a malicious repository name containing newlines from injecting arbitrary key=value pairs into the output environment.
-2. rust-install.sh (line 298): Replaced `echo "binary_path=$BINARY_PATH" >> "$GITHUB_OUTPUT"` with the same sanitization pattern using `printf '%s' "$BINARY_PATH" | tr -d '\n\r'` to strip any embedded newlines or carriage returns from the user-controlled value before writing to $GITHUB_OUTPUT.
+Fixed newline injection vulnerability in both go-install.sh (line 113) and rust-install.sh (line 338). In each script, added sanitization using `printf '%s' "$VAR" | tr -d '\n\r'` before writing the value derived from `$INPUT_REPOSITORY` to `$GITHUB_OUTPUT`. While `basename` strips path separators, it does not strip newline characters, so a malicious repository name containing a newline could inject additional key=value pairs into GITHUB_OUTPUT. The fix captures the sanitized value in a new variable (`safe_repository` / `safe_binary_path`) and uses that in the echo statement.
 

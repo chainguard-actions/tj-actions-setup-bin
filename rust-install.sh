@@ -324,6 +324,6 @@ echo "Found binary: $BINARY_PATH"
 # Make the binary executable
 chmod +x "$BINARY_PATH"
 
-# Return the binary path
+# Return the binary path (sanitize to prevent newline injection into GITHUB_OUTPUT)
 safe_binary_path=$(printf '%s' "$BINARY_PATH" | tr -d '\n\r')
 echo "binary_path=$safe_binary_path" >> "$GITHUB_OUTPUT"
